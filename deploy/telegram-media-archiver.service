@@ -1,0 +1,16 @@
+[Unit]
+Description=Telegram Media Archiver
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/telegram-media-archiver
+EnvironmentFile=/opt/telegram-media-archiver/.env
+ExecStart=/opt/telegram-media-archiver/.venv/bin/python -m tg_media_archiver.cli
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
