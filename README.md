@@ -4,7 +4,7 @@ Bot em Python para monitorar um canal do Telegram, baixar automaticamente toda m
 
 ## Arquitetura
 
-- `Telethon` para escutar mensagens novas e opcionalmente fazer backfill de histórico.
+- `Telethon` para escutar mensagens novas com bot token ou sessão de usuário, e opcionalmente fazer backfill de histórico.
 - `sqlite` para evitar upload duplicado por `(chat_id, message_id)`.
 - `rclone` para envio do arquivo a um remote configurado.
 - `systemd` e `rsync/ssh` para deploy simples em VPS.
@@ -13,8 +13,19 @@ Bot em Python para monitorar um canal do Telegram, baixar automaticamente toda m
 
 - Python 3.11+
 - `rclone` instalado e configurado no servidor
-- Credenciais do Telegram em `https://my.telegram.org`
-- A conta/sessão precisa ter acesso ao canal monitorado
+- `API ID` e `API hash` em `https://my.telegram.org`
+- Um `bot token` do `@BotFather` ou uma sessão de usuário
+- O bot ou a conta precisa ter acesso ao canal monitorado
+
+## Criando o bot
+
+1. Abra `@BotFather` no Telegram.
+2. Execute `/newbot`.
+3. Defina nome e `username` do bot.
+4. Guarde o token gerado.
+5. Adicione o bot como administrador do canal que será monitorado.
+
+Se o canal for seu, esse é o caminho mais simples. Se você quiser ler histórico antigo ou monitorar canais onde bot comum não enxerga tudo, use sessão de usuário em vez de bot token.
 
 ## Configuração local
 
@@ -32,6 +43,7 @@ pip install -e .[dev]
 TELEGRAM_API_ID=
 TELEGRAM_API_HASH=
 TELEGRAM_SESSION_NAME=media_archiver
+TELEGRAM_BOT_TOKEN=
 TELEGRAM_CHANNEL=@meu_canal
 RCLONE_REMOTE=backup:telegram-media
 ```
@@ -42,7 +54,8 @@ RCLONE_REMOTE=backup:telegram-media
 python -m tg_media_archiver.cli
 ```
 
-Na primeira execução o Telethon pode pedir login e código da conta.
+Se `TELEGRAM_BOT_TOKEN` estiver preenchido, o processo autentica como bot.
+Se ele estiver vazio, o Telethon usa sessão de usuário e pode pedir login e código na primeira execução.
 
 ## Deploy para VPS via SSH
 
@@ -96,6 +109,7 @@ git push -u origin main
 
 ## Limitações
 
-- Bot comum da Bot API não é suficiente para todos os cenários de captura em canais; aqui a base usa `Telethon` com sessão de usuário.
+- Bot comum funciona bem quando ele é administrador do canal e você só precisa capturar mensagens novas.
+- Para backfill mais confiável de histórico antigo e alguns cenários de acesso, sessão de usuário continua sendo mais forte.
 - Arquivos muito grandes dependem do limite da conta, rede e espaço temporário.
 - Se você quiser apagar o arquivo local após upload, isso pode ser adicionado como próxima etapa.

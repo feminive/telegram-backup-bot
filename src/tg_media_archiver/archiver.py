@@ -29,7 +29,12 @@ class MediaArchiver:
         )
 
     async def run(self) -> None:
-        await self.client.start()
+        if self.settings.uses_bot_token:
+            await self.client.start(bot_token=self.settings.telegram_bot_token)
+            logger.info("Authenticated with bot token")
+        else:
+            await self.client.start()
+            logger.info("Authenticated with user session")
         entity = await self.client.get_entity(self.settings.telegram_channel)
         channel_id = getattr(entity, "id", self.settings.telegram_channel)
         logger.info("Listening to %s", self.settings.telegram_channel)

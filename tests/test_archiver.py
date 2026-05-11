@@ -6,6 +6,7 @@ def test_slug_filename_preserves_extension() -> None:
     settings = Settings.model_construct(
         telegram_api_id=1,
         telegram_api_hash="hash",
+        telegram_bot_token="123:abc",
         telegram_channel="@channel",
         rclone_remote="remote:path",
     )
